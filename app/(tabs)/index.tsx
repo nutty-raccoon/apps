@@ -25,7 +25,7 @@ export default function PaymentScreen() {
     setIsProcessing(true);
     
     // Generate the random amount
-    const randomAmount = Math.floor(Math.random() * 50) + 1;
+    const randomAmount = Math.floor(Math.random() * 10) + 50;
     
     // Handle successful payment after 3 seconds
     setTimeout(() => {
@@ -41,6 +41,12 @@ export default function PaymentScreen() {
         // Return to the main screen after a delay
         setTimeout(() => {
           setShowTapToPay(false);
+          
+          // Reset error states after an additional 2 seconds (total of 3.5s from failure)
+          setTimeout(() => {
+            setPaymentFailed(false);
+            setErrorMessage("");
+          }, 2000);
         }, 1500);
       } else {
         // Normal successful payment flow
@@ -53,7 +59,7 @@ export default function PaymentScreen() {
           setIsPaid(false);
           // Subtract the random amount from the total
           setAmount(prevAmount => prevAmount - randomAmount);
-        }, 1500);
+        }, 1200);
       }
     }, 3000);
   };

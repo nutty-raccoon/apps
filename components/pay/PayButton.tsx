@@ -2,7 +2,7 @@ import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
 const PayButton = ({ onPress, isPaid, paymentFailed, amount }) => {
-  const isDisabled = isPaid || amount === 0;
+  const isDisabled = isPaid || amount === 0 || paymentFailed;
   
   return (
     <TouchableOpacity 
