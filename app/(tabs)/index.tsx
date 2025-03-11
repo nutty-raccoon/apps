@@ -1,74 +1,110 @@
-import { Image, StyleSheet, Platform } from 'react-native';
+import { useState } from "react";
+import { StyleSheet, SafeAreaView, View } from "react-native";
+import PayButton from "@/components/pay/PayButton";
+import TapToPayModal from "@/components/pay/TapToPayModal";
+import AmountDisplay from "@/components/pay/AmountDisplay";
 
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
+export default function PaymentScreen() {
+  const [amount, setAmount] = useState(125.50);
+  const [showTapToPay, setShowTapToPay] = useState(false);
+  const [isPaid, setIsPaid] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [paymentFailed, setPaymentFailed] = useState(false);
+  
+  const handlePayment = () => {
+    // Reset any error messages
+    setErrorMessage("");
+    setPaymentFailed(false);
+    // Show the tap to pay screen
+    setShowTapToPay(true);
+  };
+  
+  const handlePaymentSuccess = () => {
+    // Start processing
+    setIsProcessing(true);
+    
+    // Generate the random amount
+    const randomAmount = Math.floor(Math.random() * 50) + 1;
+    
+    // Handle successful payment after 3 seconds
+    setTimeout(() => {
+      // Check if random amount exceeds balance
+      if (randomAmount > amount) {
+        // Stop the processing animation
+        setIsProcessing(false);
+        
+        // Set error message
+        setErrorMessage("Payment cancelled: Amount exceeds balance");
+        setPaymentFailed(true);
+        
+        // Return to the main screen after a delay
+        setTimeout(() => {
+          setShowTapToPay(false);
+        }, 1500);
+      } else {
+        // Normal successful payment flow
+        setIsProcessing(false);
+        setShowTapToPay(false);
+        setIsPaid(true);
+        
+        // Update the amount after a success message is shown
+        setTimeout(() => {
+          setIsPaid(false);
+          // Subtract the random amount from the total
+          setAmount(prevAmount => prevAmount - randomAmount);
+        }, 1500);
+      }
+    }, 3000);
+  };
 
-export default function HomeScreen() {
+  const handleCancel = () => {
+    // Close the tap to pay screen
+    setShowTapToPay(false);
+    // Reset any states
+    setIsProcessing(false);
+  };
+
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
+    <SafeAreaView style={styles.container}>
+      <View style={styles.contentContainer}>
+        {/* Amount Display Component */}
+        <AmountDisplay 
+          amount={amount} 
+          errorMessage={errorMessage} 
         />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({
-              ios: 'cmd + d',
-              android: 'cmd + m',
-              web: 'F12'
-            })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+        
+        {/* Pay Button Component */}
+        <PayButton 
+          onPress={handlePayment}
+          isPaid={isPaid}
+          paymentFailed={paymentFailed}
+          amount={amount}
+        />
+      </View>
+
+      {/* Tap To Pay Modal Component */}
+      <TapToPayModal 
+        visible={showTapToPay}
+        onRequestClose={handleCancel}
+        isProcessing={isProcessing}
+        paymentFailed={paymentFailed}
+        onPaymentPress={handlePaymentSuccess}
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  titleContainer: {
-    flexDirection: 'row',
+  container: {
+    flex: 1,
+    backgroundColor: '#f7f7f7',
+  },
+  contentContainer: {
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
-    gap: 8,
-  },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+    padding: 20,
+    gap: 30,
   },
 });
