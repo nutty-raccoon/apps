@@ -3,6 +3,7 @@ import { Dispatch, SetStateAction } from "react";
 import PaymentOptionItem from "./PaymentOptionItem";
 import { 
   StyleSheet,
+  View,
 } from 'react-native';
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 
@@ -39,21 +40,26 @@ export default function DraggablePaymentOptionsFlatList({paymentOptions, setPaym
     setPaymentOptions(copy);
   }
 
-
-
   return (
-        <DragList
-          data={paymentOptions}
-          onReordered={onReordered}
-          keyExtractor={(item) => item.id}
-          renderItem={renderItem}
-        />
+    <View style={styles.listContainer}>
+      <DragList
+        data={paymentOptions}
+        onReordered={onReordered}
+        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        scrollEnabled={true}
+        contentContainerStyle={styles.dragListContent}
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   listContainer: {
-    flexGrow: 1,
-    paddingHorizontal: 16
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  dragListContent: {
+    paddingBottom: 80, // Add some padding at the bottom to ensure the last items are visible above the navbar
   }
 });

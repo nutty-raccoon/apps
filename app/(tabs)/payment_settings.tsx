@@ -10,7 +10,6 @@ import { Stack } from 'expo-router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import components
-import TapToPayStatus from '@/components/settings/TapToPayStatus';
 import DraggablePaymentOptionsFlatList from '@/components/settings/DraggablePaymentOptionsFlatList';
 
 // Import context
@@ -43,15 +42,12 @@ export default function PaymentSettingsScreen() {
         </View>
         
         {/* Draggable Payment Options List */}
-        <DraggablePaymentOptionsFlatList
-          paymentOptions={paymentOptions}
-          setPaymentOptions={setPaymentOptions}
-          isSelfVerified={isSelfVerified}
-        />
-        
-        {/* Bottom Tap-to-Pay Indicator */}
-        <View style={styles.bottomContainer}>
-          <TapToPayStatus primaryMethodName={paymentOptions[0]?.name || '' }/>
+        <View style={styles.listWrapper}>
+          <DraggablePaymentOptionsFlatList
+            paymentOptions={paymentOptions}
+            setPaymentOptions={setPaymentOptions}
+            isSelfVerified={isSelfVerified}
+          />
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>
@@ -77,11 +73,14 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     marginTop: 4,
   },
+  listWrapper: {
+    flex: 1, // This ensures the list takes up available space
+  },
   listContainer: {
     flexGrow: 1,
     paddingHorizontal: 16
   },
-   bottomContainer: {
+  bottomContainer: {
     position: 'absolute',
     bottom: 0,
     left: 0,
