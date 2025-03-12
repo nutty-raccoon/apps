@@ -15,6 +15,7 @@ export default function TabLayout(): JSX.Element {
   
   return (
     <Tabs
+      initialRouteName="pay"
       screenOptions={{
         tabBarActiveTintColor: themeColors.tint,
         tabBarInactiveTintColor: themeColors.tabIconDefault,
@@ -38,23 +39,23 @@ export default function TabLayout(): JSX.Element {
         }),
       }}>
       <Tabs.Screen
-        name="index"
+        name="pay"
         options={{
-          title: 'Home',
+          title: 'Pay',
           tabBarIcon: ({ color, size }) => (
             <IconSymbol size={size || 28} name="house.fill" color={color} />
           ),
-          tabBarAccessibilityLabel: 'Home Screen',
+          tabBarAccessibilityLabel: 'Pay Screen',
         }}
       />
       <Tabs.Screen
-        name="order_payment_methods"
+        name="payment_settings"
         options={{
           title: 'Payment',
           tabBarIcon: ({ color, size }) => (
             <IconSymbol size={size || 28} name="creditcard.fill" color={color} />
           ),
-          tabBarAccessibilityLabel: 'Payment Methods',
+          tabBarAccessibilityLabel: 'Payment Settings Screen',
         }}
       />
       <Tabs.Screen
@@ -64,7 +65,7 @@ export default function TabLayout(): JSX.Element {
           tabBarIcon: ({ color, size }) => (
             <IconSymbol size={size || 28} name="chevron.left.forwardslash.chevron.right" color={color} />
           ),
-          tabBarAccessibilityLabel: 'Identity Verification',
+          tabBarAccessibilityLabel: 'Identity Verification Screen',
         }}
       />
     </Tabs>

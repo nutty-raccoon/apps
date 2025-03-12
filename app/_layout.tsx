@@ -49,10 +49,11 @@ export default function RootLayout(): JSX.Element | null {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <PaymentProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-          <Stack screenOptions={{
+          <Stack
+            screenOptions={{
             headerShown: false,
             headerBackTitle: 'Back',
-            animation: 'slide_from_right',
+            animation: 'none',
           }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen

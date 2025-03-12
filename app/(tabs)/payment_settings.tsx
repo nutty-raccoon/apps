@@ -24,7 +24,7 @@ export default function PaymentSettingsScreen() {
       <SafeAreaView style={styles.container}>
         <Stack.Screen
           options={{
-            title: "Tap-to-Pay Settings",
+            title: "Payment Settings",
             headerShown: true,
           }}
         />

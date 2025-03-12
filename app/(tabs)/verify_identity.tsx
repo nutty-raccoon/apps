@@ -62,6 +62,26 @@ const VerifiedPassportView = ({ onForgetPress }: { onForgetPress: () => void }) 
         <SVGCheckmark width={65} height={65} color="#FFFFFF" />
       </View>
     </View>
+
+    {/* Passport Information */}
+    <View style={styles.passportInfoContainer}>
+      <View style={styles.infoRow}>
+        <ThemedText style={styles.infoLabel}>Nationality:</ThemedText>
+        <ThemedText style={styles.infoValue}>French</ThemedText>
+      </View>
+      <View style={styles.infoRow}>
+        <ThemedText style={styles.infoLabel}>Passport Number:</ThemedText>
+        <ThemedText style={styles.infoValue}>FR92375624</ThemedText>
+      </View>
+      <View style={styles.infoRow}>
+        <ThemedText style={styles.infoLabel}>Age:</ThemedText>
+        <ThemedText style={styles.infoValue}>18+</ThemedText>
+      </View>
+      <View style={styles.infoRow}>
+        <ThemedText style={styles.infoLabel}>OFAC:</ThemedText>
+        <ThemedText style={styles.infoValue}>✅</ThemedText>
+      </View>
+    </View>
     
     {/* Forget Button */}
     <TouchableOpacity
@@ -151,8 +171,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: 160,
     height: 160,
-    marginBottom: 40,
+    marginBottom: 20,
     position: 'relative',
+  },
+  passportInfoContainer: {
+    width: '100%',
+    marginBottom: 30,
+    backgroundColor: '#E8F4FF',
+    borderRadius: 10,
+    padding: 15,
+    borderWidth: 1,
+    borderColor: '#BDDEFF',
+  },
+  infoRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  infoLabel: {
+    fontWeight: 'bold',
+    color: '#0056b3',
+  },
+  infoValue: {
+    color: '#333333',
   },
   passportTop: {
     width: 160,
