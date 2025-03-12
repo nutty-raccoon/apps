@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   View, 
   Text, 
@@ -11,16 +11,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import components
 import TapToPayStatus from '@/components/settings/TapToPayStatus';
-
-// Import types
-import { PaymentOption } from '@/types/PaymentTypes';
-
-// Import constants
-import { DEFAULT_PAYMENT_METHODS } from '@/constants/PaymentMethods';
 import DraggablePaymentOptionsFlatList from '@/components/settings/DraggablePaymentOptionsFlatList';
 
+// Import context
+import { usePayment } from '@/context/PaymentContext';
+
 export default function PaymentSettingsScreen() {
-  const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>(DEFAULT_PAYMENT_METHODS);
+  const { paymentOptions, setPaymentOptions, isSelfVerified } = usePayment();
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -38,14 +35,23 @@ export default function PaymentSettingsScreen() {
           <Text style={styles.infoText}>
             Drag to rearrange payment methods by priority
           </Text>
+          {!isSelfVerified && (
+            <Text style={styles.verificationWarning}>
+              Some payment methods require passport verification to be enabled
+            </Text>
+          )}
         </View>
         
         {/* Draggable Payment Options List */}
-        <DraggablePaymentOptionsFlatList paymentOptions={paymentOptions} setPaymentOptions={setPaymentOptions} />
+        <DraggablePaymentOptionsFlatList
+          paymentOptions={paymentOptions}
+          setPaymentOptions={setPaymentOptions}
+          isSelfVerified={isSelfVerified}
+        />
         
         {/* Bottom Tap-to-Pay Indicator */}
         <View style={styles.bottomContainer}>
-        <TapToPayStatus primaryMethodName={paymentOptions[0]?.name || '' }/>
+          <TapToPayStatus primaryMethodName={paymentOptions[0]?.name || '' }/>
         </View>
       </SafeAreaView>
     </GestureHandlerRootView>
@@ -65,6 +71,11 @@ const styles = StyleSheet.create({
   infoText: {
     fontSize: 14,
     color: '#6B7280',
+  },
+  verificationWarning: {
+    fontSize: 14,
+    color: '#EF4444',
+    marginTop: 4,
   },
   listContainer: {
     flexGrow: 1,

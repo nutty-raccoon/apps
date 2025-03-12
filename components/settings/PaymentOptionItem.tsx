@@ -12,14 +12,16 @@ interface PaymentOptionItemProps {
   item: PaymentOption;
   drag: () => void;
   isActive: boolean;
+  disabled?: boolean;
 }
 
-export default function PaymentOptionItem({ item, drag, isActive }: PaymentOptionItemProps) {
+export default function PaymentOptionItem({ item, drag, isActive, disabled = false }: PaymentOptionItemProps) {
   return (
       <View
         style={[
           styles.paymentOptionContainer,
           isActive && styles.draggingItem,
+          disabled && styles.disabledItem,
         ]}
       >
         <View style={styles.paymentOptionContent}>
@@ -38,10 +40,11 @@ export default function PaymentOptionItem({ item, drag, isActive }: PaymentOptio
               </View>
               <Text style={styles.nameText}>{item.name}</Text>
             </View>
+            <Text style={styles.balanceText}>${item.usdBalance.toFixed(2)} USD</Text>
           </View>
           
           <TouchableOpacity 
-            style={styles.dragHandle}
+            style={[styles.dragHandle, disabled && styles.disabledHandle]}
             onPressIn={drag}
           >
             <View style={styles.dragHandleDotsContainer}>
@@ -65,6 +68,10 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E5E5E5',
     marginBottom: 12
+  },
+  disabledItem: {
+    opacity: 0.6,
+    backgroundColor: '#F3F4F6',
   },
   draggingItem: {
     shadowColor: '#000',
@@ -118,6 +125,11 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1F2937'
   },
+  balanceText: {
+    fontSize: 14,
+    color: '#4B5563',
+    marginTop: 4
+  },
   dragHandle: {
     width: 24,
     height: 48,
@@ -138,5 +150,8 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     backgroundColor: '#9CA3AF',
     margin: 1
+  },
+  disabledHandle: {
+    opacity: 0.5
   }
 });

@@ -1,7 +1,12 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 
-const AmountDisplay = ({ amount, errorMessage }) => {
+interface AmountDisplayProps {
+  amount: number;
+  errorMessage: string;
+}
+
+const AmountDisplay = ({ amount, errorMessage }: AmountDisplayProps) => {
   return (
     <View style={styles.amountContainer}>
       <Text style={styles.amountLabel}>Total Balance</Text>

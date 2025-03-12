@@ -3,9 +3,10 @@ import { StyleSheet, SafeAreaView, View } from "react-native";
 import PayButton from "@/components/pay/PayButton";
 import TapToPayModal from "@/components/pay/TapToPayModal";
 import AmountDisplay from "@/components/pay/AmountDisplay";
+import { usePayment } from "@/context/PaymentContext";
 
 export default function PaymentScreen() {
-  const [amount, setAmount] = useState(125.50);
+  const { isSelfVerified, totalBalance, paymentOptions, updatePaymentOption } = usePayment();
   const [showTapToPay, setShowTapToPay] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,38 +30,48 @@ export default function PaymentScreen() {
     
     // Handle successful payment after 3 seconds
     setTimeout(() => {
-      // Check if random amount exceeds balance
-      if (randomAmount > amount) {
-        // Stop the processing animation
-        setIsProcessing(false);
+      let proceedTopayment = false;
+
+      for (const paymentMethod of paymentOptions) {
         
-        // Set error message
-        setErrorMessage("Payment cancelled: Amount exceeds balance");
+        // Check if the primary method has enough balance
+        if (paymentMethod && (isSelfVerified || !paymentMethod.requriresSelfVerification) && paymentMethod.usdBalance >= randomAmount) {
+          // Deduct from the primary payment method
+          const newBalance = paymentMethod.usdBalance - randomAmount;
+          
+          // Normal successful payment flow
+          setIsProcessing(false);
+          setShowTapToPay(false);
+          setIsPaid(true);
+          
+          // Reset paid status after a success message is shown
+          setTimeout(() => {
+            setIsPaid(false);
+            updatePaymentOption(paymentMethod.id, newBalance);
+          }, 1200);
+          // Exit the loop
+          proceedTopayment = true;
+          break;
+        } 
+      }
+
+      if (!proceedTopayment) {
+        // Primary method doesn't have enough balance
+        setIsProcessing(false);
+        setErrorMessage("Primary payment method has insufficient funds");
         setPaymentFailed(true);
         
         // Return to the main screen after a delay
         setTimeout(() => {
           setShowTapToPay(false);
           
-          // Reset error states after an additional 2 seconds (total of 3.5s from failure)
+          // Reset error states after additional time
           setTimeout(() => {
             setPaymentFailed(false);
             setErrorMessage("");
           }, 2000);
         }, 1500);
-      } else {
-        // Normal successful payment flow
-        setIsProcessing(false);
-        setShowTapToPay(false);
-        setIsPaid(true);
-        
-        // Update the amount after a success message is shown
-        setTimeout(() => {
-          setIsPaid(false);
-          // Subtract the random amount from the total
-          setAmount(prevAmount => prevAmount - randomAmount);
-        }, 1200);
-      }
+      } 
     }, 3000);
   };
 
@@ -76,7 +87,7 @@ export default function PaymentScreen() {
       <View style={styles.contentContainer}>
         {/* Amount Display Component */}
         <AmountDisplay 
-          amount={amount} 
+          amount={totalBalance}
           errorMessage={errorMessage} 
         />
         
@@ -85,7 +96,7 @@ export default function PaymentScreen() {
           onPress={handlePayment}
           isPaid={isPaid}
           paymentFailed={paymentFailed}
-          amount={amount}
+          amount={totalBalance}
         />
       </View>
 

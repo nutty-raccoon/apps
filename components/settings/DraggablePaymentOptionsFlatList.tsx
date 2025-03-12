@@ -8,20 +8,23 @@ import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 
 interface DraggablePlaymentOptionsFlatListProps{
   paymentOptions: PaymentOption[],
-  setPaymentOptions: Dispatch<SetStateAction<PaymentOption[]>>
+  setPaymentOptions: Dispatch<SetStateAction<PaymentOption[]>>,
+  isSelfVerified: boolean
 }
 
-export default function DraggablePaymentOptionsFlatList({paymentOptions, setPaymentOptions}: DraggablePlaymentOptionsFlatListProps) {
+export default function DraggablePaymentOptionsFlatList({paymentOptions, setPaymentOptions, isSelfVerified}: DraggablePlaymentOptionsFlatListProps) {
 
   // Render each payment option item
   const renderItem = (info: DragListRenderItemInfo<PaymentOption>) => {
     const {item, onDragStart, isActive} = info;
+    const isDisabled = !isSelfVerified && item.requriresSelfVerification;
 
     return (
       <PaymentOptionItem
         item={item}
         drag={onDragStart}
         isActive={isActive}
+        disabled={isDisabled}
       />
     );
   };

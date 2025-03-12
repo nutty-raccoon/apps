@@ -1,7 +1,14 @@
 import React from "react";
 import { TouchableOpacity, Text, StyleSheet } from "react-native";
 
-const PayButton = ({ onPress, isPaid, paymentFailed, amount }) => {
+interface PayButtonProps {
+  onPress: () => void;
+  isPaid: boolean;
+  paymentFailed: boolean;
+  amount: number;
+}
+
+const PayButton = ({ onPress, isPaid, paymentFailed, amount }: PayButtonProps) => {
   const isDisabled = isPaid || amount === 0 || paymentFailed;
   
   return (

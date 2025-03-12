@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { View, Text, StyleSheet } from 'react-native';
+import { PaymentProvider } from '@/context/PaymentContext';
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -46,23 +47,25 @@ export default function RootLayout(): JSX.Element | null {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack screenOptions={{
-          headerShown: false,
-          headerBackTitle: 'Back',
-          animation: 'slide_from_right',
-        }}>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen 
-            name="+not-found" 
-            options={{ 
-              title: 'Not Found',
-              presentation: 'modal'
-            }} 
-          />
-        </Stack>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      </ThemeProvider>
+      <PaymentProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack screenOptions={{
+            headerShown: false,
+            headerBackTitle: 'Back',
+            animation: 'slide_from_right',
+          }}>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="+not-found"
+              options={{
+                title: 'Not Found',
+                presentation: 'modal'
+              }}
+            />
+          </Stack>
+          <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        </ThemeProvider>
+      </PaymentProvider>
     </GestureHandlerRootView>
   );
 }

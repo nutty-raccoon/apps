@@ -2,13 +2,21 @@ import React from "react";
 import { StyleSheet, Modal, SafeAreaView, View, Text, TouchableOpacity } from "react-native";
 import AnimatedTapToPayIcon from "./AnimatedTapToPayIcon";
 
+interface TapToPayModalProps {
+  visible: boolean;
+  onRequestClose: () => void;
+  isProcessing: boolean;
+  paymentFailed: boolean;
+  onPaymentPress: () => void;
+}
+
 const TapToPayModal = ({ 
   visible, 
   onRequestClose, 
   isProcessing, 
   paymentFailed,
   onPaymentPress
-}) => {
+}: TapToPayModalProps) => {
   // Determine animation status based on component state
   const animationStatus = isProcessing 
     ? 'processing' 

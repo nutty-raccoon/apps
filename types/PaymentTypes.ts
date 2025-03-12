@@ -4,6 +4,8 @@ export interface PaymentOption {
   name: string;
   iconSource: any;
   priority: number;
+  usdBalance: number;
+  requriresSelfVerification: boolean,
 }
 
 // Define type for dragging state

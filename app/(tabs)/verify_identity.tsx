@@ -8,6 +8,9 @@ import { ExternalLink } from '@/components/ExternalLink';
 import VerificationModal from '@/components/verification/VerificationModal';
 import SVGCheckmark from '@/components/verification/SVGCheckmark';
 
+// Import the Payment Context
+import { usePayment } from '@/context/PaymentContext';
+
 // Unverified view component
 const UnverifiedPassportView = ({ onScanPress }: { onScanPress: () => void }) => (
   <View style={styles.contentContainer}>
@@ -74,7 +77,9 @@ const VerifiedPassportView = ({ onForgetPress }: { onForgetPress: () => void }) 
 
 export default function VerifyIdentityScreen() {
   const [modalVisible, setModalVisible] = useState(false);
-  const [isVerified, setIsVerified] = useState(false);
+  
+  // Use the Payment Context instead of local state for verification status
+  const { isSelfVerified, updateIsSelfVerified } = usePayment();
 
   const handleScanPassport = () => {
     setModalVisible(true);
@@ -85,13 +90,14 @@ export default function VerifyIdentityScreen() {
   };
 
   const handleVerificationComplete = () => {
-    // Handle verification completion
+    // Update the global context with verification status
+    updateIsSelfVerified(true);
     setModalVisible(false);
-    setIsVerified(true);
   };
 
   const handleForgetPassport = () => {
-    setIsVerified(false);
+    // Update the global context to clear verification status
+    updateIsSelfVerified(false);
   };
 
   return (
@@ -103,7 +109,7 @@ export default function VerifyIdentityScreen() {
         }}
       />
       
-      {isVerified ? (
+      {isSelfVerified ? (
         <VerifiedPassportView onForgetPress={handleForgetPassport} />
       ) : (
         <UnverifiedPassportView onScanPress={handleScanPassport} />
