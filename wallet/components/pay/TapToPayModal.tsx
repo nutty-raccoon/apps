@@ -1,6 +1,7 @@
 import React from "react";
-import { StyleSheet, Modal, SafeAreaView, View, Text, TouchableOpacity } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import AnimatedTapToPayIcon from "./AnimatedTapToPayIcon";
+import ThemedModal from "@/components/ui/ThemedModal";
 
 interface TapToPayModalProps {
   visible: boolean;
@@ -25,83 +26,68 @@ const TapToPayModal = ({
       : 'idle';
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={false}
+    <ThemedModal
       visible={visible}
       onRequestClose={onRequestClose}
+      showCloseButton={false}
     >
-      <SafeAreaView style={styles.tapToPayContainer}>
-        <View style={styles.tapToPayContent}>
-          {/* Pass animation status to icon component */}
-          <AnimatedTapToPayIcon status={animationStatus} />
+      {/* Pass animation status to icon component */}
+      <AnimatedTapToPayIcon status={animationStatus} />
 
-          <Text style={[
-            styles.tapToPayText,
-            paymentFailed && styles.errorText
-          ]}>
-            {isProcessing ? "Processing..." :
-              paymentFailed ? "Payment Failed" :
-                "Tap to Pay"}
-          </Text>
-          <Text style={styles.tapToPaySubText}>
-            {isProcessing
-              ? "Please keep your device near the terminal"
-              : paymentFailed
-                ? "Amount exceeds your balance"
-                : "Hold your device near the payment terminal"}
-          </Text>
+      <Text style={[
+        styles.tapToPayText,
+        paymentFailed && styles.errorText
+      ]}>
+        {isProcessing ? "Processing..." :
+          paymentFailed ? "Payment Failed" :
+            "Tap to Pay"}
+      </Text>
+      <Text style={styles.tapToPaySubText}>
+        {isProcessing
+          ? "Please keep your device near the terminal"
+          : paymentFailed
+            ? "Amount exceeds your balance"
+            : "Hold your device near the payment terminal"}
+      </Text>
 
-          <TouchableOpacity
-            style={[
-              styles.tapToPayButton,
-              isProcessing && styles.disabledButton,
-              paymentFailed && styles.disabledButton
-            ]}
-            onPress={onPaymentPress}
-            disabled={isProcessing || paymentFailed}
-          >
-            <Text style={styles.tapToPayButtonText}>
-              {isProcessing ? "Processing..." :
-                paymentFailed ? "Failed" :
-                  "Simulate Payment"}
-            </Text>
-          </TouchableOpacity>
+      <TouchableOpacity
+        style={[
+          styles.tapToPayButton,
+          isProcessing && styles.disabledButton,
+          paymentFailed && styles.disabledButton
+        ]}
+        onPress={onPaymentPress}
+        disabled={isProcessing || paymentFailed}
+      >
+        <Text style={styles.tapToPayButtonText}>
+          {isProcessing ? "Processing..." :
+            paymentFailed ? "Failed" :
+              "Simulate Payment"}
+        </Text>
+      </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[
-              styles.cancelButton,
-              isProcessing && styles.disabledButton
-            ]}
-            onPress={onRequestClose}
-            disabled={isProcessing}
-          >
-            <Text style={[
-              styles.cancelButtonText,
-              isProcessing && styles.disabledText
-            ]}>
-              {paymentFailed ? "Return" : "Cancel"}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    </Modal>
+      <TouchableOpacity
+        style={[
+          styles.cancelButton,
+          isProcessing && styles.disabledButton
+        ]}
+        onPress={onRequestClose}
+        disabled={isProcessing}
+      >
+        <Text style={[
+          styles.cancelButtonText,
+          isProcessing && styles.disabledText
+        ]}>
+          {paymentFailed ? "Return" : "Cancel"}
+        </Text>
+      </TouchableOpacity>
+    </ThemedModal>
   );
 };
 
 export default TapToPayModal;
 
 const styles = StyleSheet.create({
-  tapToPayContainer: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  tapToPayContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 30,
-  },
   tapToPayText: {
     fontSize: 32,
     fontWeight: 'bold',
