@@ -10,18 +10,18 @@ interface TapToPayModalProps {
   onPaymentPress: () => void;
 }
 
-const TapToPayModal = ({ 
-  visible, 
-  onRequestClose, 
-  isProcessing, 
+const TapToPayModal = ({
+  visible,
+  onRequestClose,
+  isProcessing,
   paymentFailed,
   onPaymentPress
 }: TapToPayModalProps) => {
   // Determine animation status based on component state
-  const animationStatus = isProcessing 
-    ? 'processing' 
-    : paymentFailed 
-      ? 'error' 
+  const animationStatus = isProcessing
+    ? 'processing'
+    : paymentFailed
+      ? 'error'
       : 'idle';
 
   return (
@@ -35,40 +35,40 @@ const TapToPayModal = ({
         <View style={styles.tapToPayContent}>
           {/* Pass animation status to icon component */}
           <AnimatedTapToPayIcon status={animationStatus} />
-          
+
           <Text style={[
             styles.tapToPayText,
             paymentFailed && styles.errorText
           ]}>
-            {isProcessing ? "Processing..." : 
-             paymentFailed ? "Payment Failed" : 
-             "Tap to Pay"}
+            {isProcessing ? "Processing..." :
+              paymentFailed ? "Payment Failed" :
+                "Tap to Pay"}
           </Text>
           <Text style={styles.tapToPaySubText}>
-            {isProcessing 
+            {isProcessing
               ? "Please keep your device near the terminal"
               : paymentFailed
                 ? "Amount exceeds your balance"
                 : "Hold your device near the payment terminal"}
           </Text>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[
-              styles.tapToPayButton, 
+              styles.tapToPayButton,
               isProcessing && styles.disabledButton,
               paymentFailed && styles.disabledButton
-            ]} 
+            ]}
             onPress={onPaymentPress}
             disabled={isProcessing || paymentFailed}
           >
             <Text style={styles.tapToPayButtonText}>
-              {isProcessing ? "Processing..." : 
-               paymentFailed ? "Failed" : 
-               "Simulate Payment"}
+              {isProcessing ? "Processing..." :
+                paymentFailed ? "Failed" :
+                  "Simulate Payment"}
             </Text>
           </TouchableOpacity>
-          
-          <TouchableOpacity 
+
+          <TouchableOpacity
             style={[
               styles.cancelButton,
               isProcessing && styles.disabledButton

@@ -99,7 +99,7 @@ export default function VerifyIdentityScreen() {
 
   // Use the Payment Context instead of local state for verification status
   const { verifiedUser, updateVerifiedUser } = usePayment();
-  const isSelfVerified = verifiedUser !== null;
+  const isSelfVerified = !!verifiedUser;
 
   const handleScanPassport = () => {
     setModalVisible(true);

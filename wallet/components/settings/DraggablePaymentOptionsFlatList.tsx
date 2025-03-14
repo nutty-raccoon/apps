@@ -1,6 +1,7 @@
 import { PaymentOption } from "@/types/PaymentTypes";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import PaymentOptionItem from "./PaymentOptionItem";
+import PaymentOptionModal from "./PaymentOptionModal";
 import {
   StyleSheet,
   View,
@@ -14,11 +15,24 @@ interface DraggablePlaymentOptionsFlatListProps {
 }
 
 export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPaymentOptions, isSelfVerified }: DraggablePlaymentOptionsFlatListProps) {
+  const [selectedPaymentOption, setSelectedPaymentOption] = useState<PaymentOption | null>(null);
+  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+  // Handler for payment option press
+  const handlePaymentOptionPress = (item: PaymentOption) => {
+    setSelectedPaymentOption(item);
+    setIsModalVisible(true);
+  };
+
+  // Handler for modal close
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+  };
 
   // Render each payment option item
   const renderItem = (info: DragListRenderItemInfo<PaymentOption>) => {
     const { item, onDragStart, isActive } = info;
-    const isDisabled = !isSelfVerified && item.requriresSelfVerification;
+    const isDisabled = (!isSelfVerified && item.requriresSelfVerification) || !item.userInfo;
 
     return (
       <PaymentOptionItem
@@ -26,6 +40,7 @@ export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPay
         drag={onDragStart}
         isActive={isActive}
         disabled={isDisabled}
+        onPress={handlePaymentOptionPress}
       />
     );
   };
@@ -49,6 +64,12 @@ export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPay
         renderItem={renderItem}
         scrollEnabled={true}
         contentContainerStyle={styles.dragListContent}
+      />
+
+      <PaymentOptionModal
+        isVisible={isModalVisible}
+        paymentOption={selectedPaymentOption}
+        onClose={handleModalClose}
       />
     </View>
   );
