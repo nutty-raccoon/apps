@@ -10,6 +10,7 @@ import SVGCheckmark from '@/components/verification/SVGCheckmark';
 
 // Import the Payment Context
 import { usePayment } from '@/context/PaymentContext';
+import { VerifiedUser } from '@/types/VerificationTypes';
 
 // Unverified view component
 const UnverifiedPassportView = ({ onScanPress }: { onScanPress: () => void }) => (
@@ -18,19 +19,19 @@ const UnverifiedPassportView = ({ onScanPress }: { onScanPress: () => void }) =>
     <ThemedText type="title" style={styles.title}>
       ZK-prove your identity with Self.xyz
     </ThemedText>
-    
+
     {/* Learn More Link */}
     <ExternalLink href='https://self.xyz/' style={styles.learnMoreLink}>
       <ThemedText type="link">Learn more about Self</ThemedText>
     </ExternalLink>
-    
+
     {/* E-Passport Icon */}
     <View style={styles.passportIconContainer}>
       <View style={styles.passportTop} />
       <View style={styles.passportCircle} />
       <View style={styles.passportBottom} />
     </View>
-    
+
     {/* Scan Button */}
     <TouchableOpacity
       style={styles.scanButton}
@@ -44,19 +45,25 @@ const UnverifiedPassportView = ({ onScanPress }: { onScanPress: () => void }) =>
 );
 
 // Verified view component
-const VerifiedPassportView = ({ onForgetPress }: { onForgetPress: () => void }) => (
+const VerifiedPassportView = ({
+  onForgetPress,
+  verifiedUser,
+}: {
+  onForgetPress: () => void,
+  verifiedUser: VerifiedUser,
+}) => (
   <View style={styles.contentContainer}>
     {/* Title */}
     <ThemedText type="title" style={styles.title}>
       Passport verified by Self.xyz
     </ThemedText>
-    
+
     {/* E-Passport Icon with Checkmark */}
     <View style={styles.passportIconContainer}>
       <View style={styles.passportTop} />
       <View style={styles.passportCircle} />
       <View style={styles.passportBottom} />
-      
+
       {/* Checkmark overlay */}
       <View style={styles.checkmarkContainer}>
         <SVGCheckmark width={65} height={65} color="#FFFFFF" />
@@ -67,22 +74,14 @@ const VerifiedPassportView = ({ onForgetPress }: { onForgetPress: () => void }) 
     <View style={styles.passportInfoContainer}>
       <View style={styles.infoRow}>
         <ThemedText style={styles.infoLabel}>Nationality:</ThemedText>
-        <ThemedText style={styles.infoValue}>French</ThemedText>
+        <ThemedText style={styles.infoValue}>{verifiedUser.nationality}</ThemedText>
       </View>
       <View style={styles.infoRow}>
         <ThemedText style={styles.infoLabel}>Passport Number:</ThemedText>
-        <ThemedText style={styles.infoValue}>FR92375624</ThemedText>
-      </View>
-      <View style={styles.infoRow}>
-        <ThemedText style={styles.infoLabel}>Age:</ThemedText>
-        <ThemedText style={styles.infoValue}>18+</ThemedText>
-      </View>
-      <View style={styles.infoRow}>
-        <ThemedText style={styles.infoLabel}>OFAC:</ThemedText>
-        <ThemedText style={styles.infoValue}>✅</ThemedText>
+        <ThemedText style={styles.infoValue}>{verifiedUser.passportNumber}</ThemedText>
       </View>
     </View>
-    
+
     {/* Forget Button */}
     <TouchableOpacity
       style={styles.forgetButton}
@@ -97,9 +96,10 @@ const VerifiedPassportView = ({ onForgetPress }: { onForgetPress: () => void }) 
 
 export default function VerifyIdentityScreen() {
   const [modalVisible, setModalVisible] = useState(false);
-  
+
   // Use the Payment Context instead of local state for verification status
-  const { isSelfVerified, updateIsSelfVerified } = usePayment();
+  const { verifiedUser, updateVerifiedUser } = usePayment();
+  const isSelfVerified = verifiedUser !== null;
 
   const handleScanPassport = () => {
     setModalVisible(true);
@@ -109,15 +109,13 @@ export default function VerifyIdentityScreen() {
     setModalVisible(false);
   };
 
-  const handleVerificationComplete = () => {
-    // Update the global context with verification status
-    updateIsSelfVerified(true);
+  const handleVerificationComplete = (verifiedUser: VerifiedUser) => {
+    updateVerifiedUser(verifiedUser);
     setModalVisible(false);
   };
 
   const handleForgetPassport = () => {
-    // Update the global context to clear verification status
-    updateIsSelfVerified(false);
+    updateVerifiedUser(null);
   };
 
   return (
@@ -128,9 +126,12 @@ export default function VerifyIdentityScreen() {
           headerShown: true,
         }}
       />
-      
+
       {isSelfVerified ? (
-        <VerifiedPassportView onForgetPress={handleForgetPassport} />
+        <VerifiedPassportView
+          onForgetPress={handleForgetPassport}
+          verifiedUser={verifiedUser}
+        />
       ) : (
         <UnverifiedPassportView onScanPress={handleScanPassport} />
       )}

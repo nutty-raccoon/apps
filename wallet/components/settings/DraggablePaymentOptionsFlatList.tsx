@@ -1,23 +1,23 @@
 import { PaymentOption } from "@/types/PaymentTypes";
 import { Dispatch, SetStateAction } from "react";
 import PaymentOptionItem from "./PaymentOptionItem";
-import { 
+import {
   StyleSheet,
   View,
 } from 'react-native';
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
 
-interface DraggablePlaymentOptionsFlatListProps{
+interface DraggablePlaymentOptionsFlatListProps {
   paymentOptions: PaymentOption[],
   setPaymentOptions: Dispatch<SetStateAction<PaymentOption[]>>,
   isSelfVerified: boolean
 }
 
-export default function DraggablePaymentOptionsFlatList({paymentOptions, setPaymentOptions, isSelfVerified}: DraggablePlaymentOptionsFlatListProps) {
+export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPaymentOptions, isSelfVerified }: DraggablePlaymentOptionsFlatListProps) {
 
   // Render each payment option item
   const renderItem = (info: DragListRenderItemInfo<PaymentOption>) => {
-    const {item, onDragStart, isActive} = info;
+    const { item, onDragStart, isActive } = info;
     const isDisabled = !isSelfVerified && item.requriresSelfVerification;
 
     return (
@@ -36,7 +36,7 @@ export default function DraggablePaymentOptionsFlatList({paymentOptions, setPaym
     copy.splice(toIndex, 0, removed[0]); // Now insert at the new pos
 
     copy.forEach((value, idx) => value.priority = idx + 1)
-    
+
     setPaymentOptions(copy);
   }
 

@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 import { PaymentOption } from '@/types/PaymentTypes';
+import { VerifiedUser } from '@/types/VerificationTypes';
 import { DEFAULT_PAYMENT_METHODS } from '@/constants/PaymentMethods';
 
 interface PaymentContextType {
@@ -7,8 +8,8 @@ interface PaymentContextType {
   setPaymentOptions: React.Dispatch<React.SetStateAction<PaymentOption[]>>;
   totalBalance: number;
   updatePaymentOption: (id: string, newBalance: number) => void;
-  isSelfVerified: boolean;
-  updateIsSelfVerified: (isSelfVerified: boolean) => void;
+  verifiedUser?: VerifiedUser;
+  updateVerifiedUser: (verifiedUser: VerifiedUser) => void;
 }
 
 // Create the context with a default value
@@ -26,7 +27,7 @@ export const usePayment = () => {
 // Provider component to wrap the app
 export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>(DEFAULT_PAYMENT_METHODS);
-  const [isSelfVerified, setIsSelfVerified] = useState<boolean>(false);
+  const [isSelfVerified, setIsSelfVerified] = useState<VerifiedUser>(null);
 
   // Calculate total balance from all payment methods
   const totalBalance = paymentOptions.reduce((sum, option) => sum + option.usdBalance, 0);
@@ -40,8 +41,8 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
     );
   };
 
-  const updateIsSelfVerified= (newIsSelfVerified: boolean) => {
-    setIsSelfVerified(newIsSelfVerified);
+  const updateIsSelfVerified = (verifiedUser: VerifiedUser) => {
+    setIsSelfVerified(verifiedUser);
   };
 
   return (
@@ -50,8 +51,8 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
       setPaymentOptions,
       totalBalance,
       updatePaymentOption,
-      isSelfVerified,
-      updateIsSelfVerified,
+      verifiedUser: isSelfVerified,
+      updateVerifiedUser: updateIsSelfVerified,
     }}>
       {children}
     </PaymentContext.Provider>

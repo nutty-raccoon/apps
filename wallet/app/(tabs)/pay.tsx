@@ -6,13 +6,13 @@ import AmountDisplay from "@/components/pay/AmountDisplay";
 import { usePayment } from "@/context/PaymentContext";
 
 export default function PaymentScreen() {
-  const { isSelfVerified, totalBalance, paymentOptions, updatePaymentOption } = usePayment();
+  const { verifiedUser, totalBalance, paymentOptions, updatePaymentOption } = usePayment();
   const [showTapToPay, setShowTapToPay] = useState(false);
   const [isPaid, setIsPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [paymentFailed, setPaymentFailed] = useState(false);
-  
+
   const handlePayment = () => {
     // Reset any error messages
     setErrorMessage("");
@@ -20,30 +20,30 @@ export default function PaymentScreen() {
     // Show the tap to pay screen
     setShowTapToPay(true);
   };
-  
+
   const handlePaymentSuccess = () => {
     // Start processing
     setIsProcessing(true);
-    
+
     // Generate the random amount
     const randomAmount = Math.floor(Math.random() * 10) + 50;
-    
+
     // Handle successful payment after 3 seconds
     setTimeout(() => {
       let proceedTopayment = false;
 
       for (const paymentMethod of paymentOptions) {
-        
+
         // Check if the primary method has enough balance
-        if (paymentMethod && (isSelfVerified || !paymentMethod.requriresSelfVerification) && paymentMethod.usdBalance >= randomAmount) {
+        if (paymentMethod && (verifiedUser || !paymentMethod.requriresSelfVerification) && paymentMethod.usdBalance >= randomAmount) {
           // Deduct from the primary payment method
           const newBalance = paymentMethod.usdBalance - randomAmount;
-          
+
           // Normal successful payment flow
           setIsProcessing(false);
           setShowTapToPay(false);
           setIsPaid(true);
-          
+
           // Reset paid status after a success message is shown
           setTimeout(() => {
             setIsPaid(false);
@@ -52,7 +52,7 @@ export default function PaymentScreen() {
           // Exit the loop
           proceedTopayment = true;
           break;
-        } 
+        }
       }
 
       if (!proceedTopayment) {
@@ -60,18 +60,18 @@ export default function PaymentScreen() {
         setIsProcessing(false);
         setErrorMessage("Primary payment method has insufficient funds");
         setPaymentFailed(true);
-        
+
         // Return to the main screen after a delay
         setTimeout(() => {
           setShowTapToPay(false);
-          
+
           // Reset error states after additional time
           setTimeout(() => {
             setPaymentFailed(false);
             setErrorMessage("");
           }, 2000);
         }, 1500);
-      } 
+      }
     }, 3000);
   };
 
@@ -86,13 +86,13 @@ export default function PaymentScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.contentContainer}>
         {/* Amount Display Component */}
-        <AmountDisplay 
+        <AmountDisplay
           amount={totalBalance}
-          errorMessage={errorMessage} 
+          errorMessage={errorMessage}
         />
-        
+
         {/* Pay Button Component */}
-        <PayButton 
+        <PayButton
           onPress={handlePayment}
           isPaid={isPaid}
           paymentFailed={paymentFailed}
@@ -101,7 +101,7 @@ export default function PaymentScreen() {
       </View>
 
       {/* Tap To Pay Modal Component */}
-      <TapToPayModal 
+      <TapToPayModal
         visible={showTapToPay}
         onRequestClose={handleCancel}
         isProcessing={isProcessing}

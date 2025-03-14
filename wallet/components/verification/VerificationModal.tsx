@@ -6,21 +6,21 @@ import {
   TouchableOpacity,
   Dimensions,
   Platform,
-  StatusBar,
-  Text
+  StatusBar
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 
-import SelfQRCode from './SelfQRCode';
+import { ThemedText } from '@/components/ThemedText';
+import UUIDDisplay from './UUIDDisplay';
 import { IconSymbol } from '@/components/ui/IconSymbol';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Colors } from '@/constants/Colors';
-import { ThemedText } from '@/components/ThemedText';
+import { VerifiedUser } from '@/types/VerificationTypes';
 
 interface VerificationModalProps {
   visible: boolean;
   onClose: () => void;
-  onVerificationComplete?: () => void;
+  onVerificationComplete: (user: VerifiedUser) => void;
 }
 
 export default function VerificationModal({
@@ -31,6 +31,14 @@ export default function VerificationModal({
   const colorScheme = useColorScheme() ?? 'light';
   const statusBarHeight = StatusBar.currentHeight || 0;
   const topPadding = Platform.OS === 'ios' ? 40 : statusBarHeight;
+
+  // Handle verification completion
+  const handleVerificationComplete = (verifiedUser: VerifiedUser) => {
+    // Close the modal first
+    onClose();
+    // Then trigger the verification complete callback
+    onVerificationComplete(verifiedUser);
+  };
 
   return (
     <Modal
@@ -49,33 +57,27 @@ export default function VerificationModal({
           styles.modalView,
           { backgroundColor: colorScheme === 'dark' ? '#1E1E1E' : '#F5F5F7' }
         ]}>
-          <TouchableOpacity
-            style={styles.closeButton}
-            onPress={onClose}
-          >
-            <IconSymbol
-              name="chevron.right"
-              size={28}
-              color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon}
-              style={{ transform: [{ rotate: '90deg' }] }}
-            />
-          </TouchableOpacity>
-          
-          <SelfQRCode onVerificationComplete={onVerificationComplete} />
-          
-          <TouchableOpacity
-            style={styles.mockVerifyButton}
-            onPress={() => {
-              if (onVerificationComplete) {
-                onVerificationComplete();
-              }
-              onClose();
-            }}
-          >
-            <ThemedText style={styles.mockVerifyButtonText}>
-              Mock Passport Verified
-            </ThemedText>
-          </TouchableOpacity>
+          <View style={styles.headerContainer}>
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={onClose}
+            >
+              <IconSymbol
+                name="chevron.right"
+                size={28}
+                color={colorScheme === 'dark' ? Colors.dark.icon : Colors.light.icon}
+                style={{ transform: [{ rotate: '90deg' }] }}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={onClose}
+            >
+              <ThemedText>Cancel</ThemedText>
+            </TouchableOpacity>
+          </View>
+
+          <UUIDDisplay onVerificationComplete={handleVerificationComplete} onVerificationFailed={onClose} />
         </View>
       </View>
     </Modal>
@@ -105,32 +107,17 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 5,
   },
-  closeButton: {
-    alignSelf: 'flex-start',
-    padding: 10,
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
     marginBottom: 10,
   },
-  mockVerifyButton: {
-    backgroundColor: '#2ecc71',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
-    alignSelf: 'center',
-    marginTop: 20,
-    width: '100%',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+  closeButton: {
+    padding: 10,
   },
-  mockVerifyButtonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
+  cancelButton: {
+    padding: 10,
   }
 });

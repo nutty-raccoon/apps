@@ -1,9 +1,9 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
   StatusBar
 } from 'react-native';
 import { Stack } from 'expo-router';
@@ -16,7 +16,8 @@ import DraggablePaymentOptionsFlatList from '@/components/settings/DraggablePaym
 import { usePayment } from '@/context/PaymentContext';
 
 export default function PaymentSettingsScreen() {
-  const { paymentOptions, setPaymentOptions, isSelfVerified } = usePayment();
+  const { paymentOptions, setPaymentOptions, verifiedUser } = usePayment();
+  const isSelfVerified = verifiedUser !== null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -28,7 +29,7 @@ export default function PaymentSettingsScreen() {
           }}
         />
         <StatusBar barStyle="dark-content" />
-        
+
         {/* Info Header */}
         <View style={styles.infoHeader}>
           <Text style={styles.infoText}>
@@ -40,7 +41,7 @@ export default function PaymentSettingsScreen() {
             </Text>
           )}
         </View>
-        
+
         {/* Draggable Payment Options List */}
         <View style={styles.listWrapper}>
           <DraggablePaymentOptionsFlatList
