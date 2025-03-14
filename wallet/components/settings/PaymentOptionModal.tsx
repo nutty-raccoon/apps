@@ -3,13 +3,12 @@ import {
   View,
   Text,
   StyleSheet,
-  Modal,
   TouchableOpacity,
   Image,
-  ScrollView,
-  Pressable
+  ScrollView
 } from 'react-native';
 import { PaymentOption } from '@/types/PaymentTypes';
+import ThemedModal from '@/components/ui/ThemedModal';
 
 interface PaymentOptionModalProps {
   isVisible: boolean;
@@ -25,89 +24,71 @@ export default function PaymentOptionModal({
   if (!paymentOption) return null;
 
   return (
-    <Modal
-      animationType="slide"
-      transparent={true}
+    <ThemedModal
       visible={isVisible}
       onRequestClose={onClose}
+      showCloseButton={false}
     >
-      <Pressable
-        style={styles.modalOverlay}
+      <View style={styles.modalHeader}>
+        <View style={styles.iconAndNameContainer}>
+          <View style={styles.iconContainer}>
+            <Image
+              source={paymentOption.iconSource}
+              style={styles.iconImage}
+              resizeMode="contain"
+            />
+          </View>
+          <Text style={styles.nameText}>{paymentOption.name}</Text>
+        </View>
+        <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+          <Text style={styles.closeButtonText}>×</Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.modalContent} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Priority</Text>
+          <View style={styles.priorityBadge}>
+            <Text style={styles.priorityText}>{paymentOption.priority}</Text>
+          </View>
+        </View>
+
+        {paymentOption.userInfo &&
+          <View style={styles.detailRow}>
+            <Text style={styles.detailLabel}>Balance</Text>
+            <Text style={styles.detailValue}>${paymentOption.userInfo.usdBalance.toFixed(2)} USD</Text>
+          </View>
+        }
+
+        {paymentOption.requriresSelfVerification && (
+          <View style={styles.verificationWarning}>
+            <Text style={styles.verificationText}>
+              This payment method requires identity verification
+            </Text>
+          </View>
+        )}
+
+        <TouchableOpacity style={styles.actionButton}>
+          <Text style={styles.actionButtonText}>Edit Payment Method</Text>
+        </TouchableOpacity>
+      </ScrollView>
+
+      <TouchableOpacity
+        style={styles.cancelButton}
         onPress={onClose}
       >
-        <View
-          style={styles.modalContainer}
-          // Stop propagation of touch events to prevent closing when clicking on content
-          onStartShouldSetResponder={() => true}
-          onTouchEnd={(e) => e.stopPropagation()}
-        >
-          <View style={styles.modalHeader}>
-            <View style={styles.iconAndNameContainer}>
-              <View style={styles.iconContainer}>
-                <Image
-                  source={paymentOption.iconSource}
-                  style={styles.iconImage}
-                  resizeMode="contain"
-                />
-              </View>
-              <Text style={styles.nameText}>{paymentOption.name}</Text>
-            </View>
-            <TouchableOpacity style={styles.closeButton} onPress={onClose}>
-              <Text style={styles.closeButtonText}>×</Text>
-            </TouchableOpacity>
-          </View>
-
-          <ScrollView style={styles.modalContent}>
-            <View style={styles.detailRow}>
-              <Text style={styles.detailLabel}>Priority</Text>
-              <View style={styles.priorityBadge}>
-                <Text style={styles.priorityText}>{paymentOption.priority}</Text>
-              </View>
-            </View>
-
-            {paymentOption.userInfo &&
-              <View style={styles.detailRow}>
-                <Text style={styles.detailLabel}>Balance</Text>
-                <Text style={styles.detailValue}>${paymentOption.userInfo.usdBalance.toFixed(2)} USD</Text>
-              </View>
-            }
-
-            {paymentOption.requriresSelfVerification && (
-              <View style={styles.verificationWarning}>
-                <Text style={styles.verificationText}>
-                  This payment method requires identity verification
-                </Text>
-              </View>
-            )}
-
-            <TouchableOpacity style={styles.actionButton}>
-              <Text style={styles.actionButtonText}>Edit Payment Method</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-      </Pressable>
-    </Modal>
+        <Text style={styles.cancelButtonText}>Close</Text>
+      </TouchableOpacity>
+    </ThemedModal>
   );
 }
 
 const styles = StyleSheet.create({
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContainer: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingVertical: 20,
-    maxHeight: '80%',
-  },
   modalHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    width: '100%',
     marginBottom: 16,
   },
   iconAndNameContainer: {
@@ -144,7 +125,11 @@ const styles = StyleSheet.create({
     color: '#6B7280',
   },
   modalContent: {
-    paddingHorizontal: 16,
+    width: '100%',
+    marginBottom: 20,
+  },
+  scrollContent: {
+    paddingBottom: 20,
   },
   detailRow: {
     flexDirection: 'row',
@@ -187,31 +172,32 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#EF4444',
   },
-  detailSection: {
-    marginVertical: 16,
-  },
-  sectionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 8,
-  },
-  descriptionText: {
-    fontSize: 14,
-    color: '#4B5563',
-    lineHeight: 20,
-  },
   actionButton: {
     backgroundColor: '#1E40AF',
     borderRadius: 8,
     padding: 16,
     alignItems: 'center',
     marginTop: 16,
-    marginBottom: 32,
+    width: '100%',
   },
   actionButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
+  },
+  cancelButton: {
+    paddingVertical: 15,
+    paddingHorizontal: 30,
+    borderRadius: 10,
+    width: '100%',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#999',
+    marginTop: 20,
+  },
+  cancelButtonText: {
+    color: '#333',
+    fontSize: 18,
+    fontWeight: '500',
   },
 });
