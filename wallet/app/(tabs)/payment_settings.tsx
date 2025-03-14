@@ -17,7 +17,7 @@ import { usePayment } from '@/context/PaymentContext';
 
 export default function PaymentSettingsScreen() {
   const { paymentOptions, setPaymentOptions, verifiedUser } = usePayment();
-  const isSelfVerified = verifiedUser !== null;
+  const isSelfVerified = !!verifiedUser;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

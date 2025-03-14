@@ -1,10 +1,11 @@
 import React from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
+import {
+  View,
+  Text,
+  StyleSheet,
   TouchableOpacity,
-  Image
+  Image,
+  Pressable
 } from 'react-native';
 import { PaymentOption } from '@/types/PaymentTypes';
 
@@ -13,51 +14,69 @@ interface PaymentOptionItemProps {
   drag: () => void;
   isActive: boolean;
   disabled?: boolean;
+  onPress?: (item: PaymentOption) => void;
 }
 
-export default function PaymentOptionItem({ item, drag, isActive, disabled = false }: PaymentOptionItemProps) {
+export default function PaymentOptionItem({
+  item,
+  drag,
+  isActive,
+  disabled = false,
+  onPress
+}: PaymentOptionItemProps) {
+
+  const handlePress = () => {
+    if (onPress && !isActive) {
+      onPress(item);
+    }
+  };
+
   return (
-      <View
-        style={[
-          styles.paymentOptionContainer,
-          isActive && styles.draggingItem,
-          disabled && styles.disabledItem,
-        ]}
-      >
-        <View style={styles.paymentOptionContent}>
-          <View style={styles.iconContainer}>
-            <Image 
-              source={item.iconSource} 
-              style={styles.iconImage}
-              resizeMode="contain"
-            />
-          </View>
-          
-          <View style={styles.infoContainer}>
-            <View style={styles.nameRow}>
-              <View style={styles.priorityBadge}>
-                <Text style={styles.priorityText}>{item.priority}</Text>
-              </View>
-              <Text style={styles.nameText}>{item.name}</Text>
-            </View>
-            <Text style={styles.balanceText}>${item.usdBalance.toFixed(2)} USD</Text>
-          </View>
-          
-          <TouchableOpacity 
-            style={[styles.dragHandle, disabled && styles.disabledHandle]}
-            onPressIn={drag}
-          >
-            <View style={styles.dragHandleDotsContainer}>
-              <View style={styles.dragHandleDot} />
-              <View style={styles.dragHandleDot} />
-              <View style={styles.dragHandleDot} />
-              <View style={styles.dragHandleDot} />
-              <View style={styles.dragHandleDot} />
-              <View style={styles.dragHandleDot} />
-            </View>
-          </TouchableOpacity>
+    <Pressable
+      style={[
+        styles.paymentOptionContainer,
+        isActive && styles.draggingItem,
+        disabled && styles.disabledItem,
+      ]}
+      onPress={handlePress}
+      disabled={isActive} // Disable press while dragging
+    >
+      <View style={styles.paymentOptionContent}>
+        <View style={styles.iconContainer}>
+          <Image
+            source={item.iconSource}
+            style={styles.iconImage}
+            resizeMode="contain"
+          />
         </View>
+
+        <View style={styles.infoContainer}>
+          <View style={styles.nameRow}>
+            <View style={styles.priorityBadge}>
+              <Text style={styles.priorityText}>{item.priority}</Text>
+            </View>
+            <Text style={styles.nameText}>{item.name}</Text>
+          </View>
+          {item.userInfo &&
+            <Text style={styles.balanceText}>${item.userInfo.usdBalance.toFixed(2)} USD</Text>
+          }
+        </View>
+
+        <TouchableOpacity
+          style={[styles.dragHandle, disabled && styles.disabledHandle]}
+          onPressIn={drag}
+        >
+          <View style={styles.dragHandleDotsContainer}>
+            <View style={styles.dragHandleDot} />
+            <View style={styles.dragHandleDot} />
+            <View style={styles.dragHandleDot} />
+            <View style={styles.dragHandleDot} />
+            <View style={styles.dragHandleDot} />
+            <View style={styles.dragHandleDot} />
+          </View>
+        </TouchableOpacity>
       </View>
+    </Pressable>
   );
 }
 

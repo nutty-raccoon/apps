@@ -30,7 +30,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
   const [isSelfVerified, setIsSelfVerified] = useState<VerifiedUser>(null);
 
   // Calculate total balance from all payment methods
-  const totalBalance = paymentOptions.reduce((sum, option) => sum + option.usdBalance, 0);
+  const totalBalance = paymentOptions.reduce((sum, option) => sum + (option.userInfo && option.userInfo.usdBalance || 0), 0);
 
   // Function to update a specific payment option's balance
   const updatePaymentOption = (id: string, newBalance: number) => {

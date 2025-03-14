@@ -1,11 +1,16 @@
+export interface userInfo {
+  id: string;
+  usdBalance: number;
+}
+
 // Define types for payment options
 export interface PaymentOption {
   id: string;
   name: string;
   iconSource: any;
   priority: number;
-  usdBalance: number;
   requriresSelfVerification: boolean,
+  userInfo?: userInfo;
 }
 
 // Define type for dragging state
