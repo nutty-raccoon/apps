@@ -35,9 +35,9 @@ export default function PaymentScreen() {
       for (const paymentMethod of paymentOptions) {
 
         // Check if the primary method has enough balance
-        if (paymentMethod && paymentMethod.userInfo && (verifiedUser || !paymentMethod.requriresSelfVerification) && paymentMethod.userInfo.usdBalance >= randomAmount) {
+        if (paymentMethod && (verifiedUser || !paymentMethod.requriresSelfVerification) && paymentMethod.usdBalance >= randomAmount) {
           // Deduct from the primary payment method
-          const newBalance = paymentMethod.userInfo.usdBalance - randomAmount;
+          const newBalance = paymentMethod.usdBalance - randomAmount;
 
           // Normal successful payment flow
           setIsProcessing(false);

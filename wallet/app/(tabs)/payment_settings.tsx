@@ -7,7 +7,6 @@ import {
   StatusBar
 } from 'react-native';
 import { Stack } from 'expo-router';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 // Import components
 import DraggablePaymentOptionsFlatList from '@/components/settings/DraggablePaymentOptionsFlatList';
@@ -20,38 +19,36 @@ export default function PaymentSettingsScreen() {
   const isSelfVerified = !!verifiedUser;
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaView style={styles.container}>
-        <Stack.Screen
-          options={{
-            title: "Payment Settings",
-            headerShown: true,
-          }}
-        />
-        <StatusBar barStyle="dark-content" />
+    <SafeAreaView style={styles.container}>
+      <Stack.Screen
+        options={{
+          title: "Payment Settings",
+          headerShown: true,
+        }}
+      />
+      <StatusBar barStyle="dark-content" />
 
-        {/* Info Header */}
-        <View style={styles.infoHeader}>
-          <Text style={styles.infoText}>
-            Drag to rearrange payment methods by priority
+      {/* Info Header */}
+      <View style={styles.infoHeader}>
+        <Text style={styles.infoText}>
+          Drag to rearrange payment methods by priority
+        </Text>
+        {!isSelfVerified && (
+          <Text style={styles.verificationWarning}>
+            Some payment methods require passport verification to be enabled
           </Text>
-          {!isSelfVerified && (
-            <Text style={styles.verificationWarning}>
-              Some payment methods require passport verification to be enabled
-            </Text>
-          )}
-        </View>
+        )}
+      </View>
 
-        {/* Draggable Payment Options List */}
-        <View style={styles.listWrapper}>
-          <DraggablePaymentOptionsFlatList
-            paymentOptions={paymentOptions}
-            setPaymentOptions={setPaymentOptions}
-            isSelfVerified={isSelfVerified}
-          />
-        </View>
-      </SafeAreaView>
-    </GestureHandlerRootView>
+      {/* Draggable Payment Options List */}
+      <View style={styles.listWrapper}>
+        <DraggablePaymentOptionsFlatList
+          paymentOptions={paymentOptions}
+          setPaymentOptions={setPaymentOptions}
+          isSelfVerified={isSelfVerified}
+        />
+      </View>
+    </SafeAreaView>
   );
 }
 

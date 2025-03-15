@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { Platform, useWindowDimensions } from 'react-native';
+import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
 import { IconSymbol } from '@/components/ui/IconSymbol';
@@ -10,9 +10,8 @@ import { useColorScheme } from '@/hooks/useColorScheme';
 
 export default function TabLayout(): JSX.Element {
   const colorScheme = useColorScheme();
-  const { width } = useWindowDimensions();
   const themeColors = Colors[colorScheme ?? 'light'];
-  
+
   return (
     <Tabs
       initialRouteName="pay"

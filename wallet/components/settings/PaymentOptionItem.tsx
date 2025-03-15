@@ -57,9 +57,7 @@ export default function PaymentOptionItem({
             </View>
             <Text style={styles.nameText}>{item.name}</Text>
           </View>
-          {item.userInfo &&
-            <Text style={styles.balanceText}>${item.userInfo.usdBalance.toFixed(2)} USD</Text>
-          }
+          <Text style={styles.balanceText}>${item.usdBalance.toFixed(2)} USD</Text>
         </View>
 
         <TouchableOpacity

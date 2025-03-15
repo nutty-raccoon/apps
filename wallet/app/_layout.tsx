@@ -25,7 +25,7 @@ export default function RootLayout(): JSX.Element | null {
         console.warn('Failed to hide splash screen:', err);
       });
     }
-    
+
     // Return cleanup function
     return () => {
       // Any cleanup needed when component unmounts
@@ -46,15 +46,15 @@ export default function RootLayout(): JSX.Element | null {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView>
       <PaymentProvider>
         <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Stack
             screenOptions={{
-            headerShown: false,
-            headerBackTitle: 'Back',
-            animation: 'none',
-          }}>
+              headerShown: false,
+              headerBackTitle: 'Back',
+              animation: 'none',
+            }}>
             <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
             <Stack.Screen
               name="+not-found"

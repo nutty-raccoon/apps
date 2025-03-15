@@ -1,4 +1,4 @@
-import React from 'react';
+import { useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,23 +9,33 @@ import {
 } from 'react-native';
 import { PaymentOption } from '@/types/PaymentTypes';
 import ThemedModal from '@/components/ui/ThemedModal';
+import WagmiDemo from '../wagmi';
+import { WagmiProvider } from 'wagmi';
+import { wagmiQueryClient, persister, wagmiConfig } from '@/constants/Wagmi';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { usePayment } from '@/context/PaymentContext';
 
 interface PaymentOptionModalProps {
-  isVisible: boolean;
-  paymentOption: PaymentOption | null;
+  paymentOption: PaymentOption;
   onClose: () => void;
 }
 
 export default function PaymentOptionModal({
-  isVisible,
   paymentOption,
   onClose
 }: PaymentOptionModalProps) {
-  if (!paymentOption) return null;
+  const { paymentOptions } = usePayment();
+
+  // Get the latest data for this payment option from the context
+  // Only proceed if we have a selected payment option
+  const currentPaymentOption = useMemo(() => {
+    return paymentOptions.find(option => option.id === paymentOption.id) || paymentOption;
+  }, [paymentOption, paymentOptions]);
+
 
   return (
     <ThemedModal
-      visible={isVisible}
+      visible={true}
       onRequestClose={onClose}
       showCloseButton={false}
     >
@@ -33,12 +43,12 @@ export default function PaymentOptionModal({
         <View style={styles.iconAndNameContainer}>
           <View style={styles.iconContainer}>
             <Image
-              source={paymentOption.iconSource}
+              source={currentPaymentOption.iconSource}
               style={styles.iconImage}
               resizeMode="contain"
             />
           </View>
-          <Text style={styles.nameText}>{paymentOption.name}</Text>
+          <Text style={styles.nameText}>{currentPaymentOption.name}</Text>
         </View>
         <TouchableOpacity style={styles.closeButton} onPress={onClose}>
           <Text style={styles.closeButtonText}>×</Text>
@@ -49,18 +59,16 @@ export default function PaymentOptionModal({
         <View style={styles.detailRow}>
           <Text style={styles.detailLabel}>Priority</Text>
           <View style={styles.priorityBadge}>
-            <Text style={styles.priorityText}>{paymentOption.priority}</Text>
+            <Text style={styles.priorityText}>{currentPaymentOption.priority}</Text>
           </View>
         </View>
 
-        {paymentOption.userInfo &&
-          <View style={styles.detailRow}>
-            <Text style={styles.detailLabel}>Balance</Text>
-            <Text style={styles.detailValue}>${paymentOption.userInfo.usdBalance.toFixed(2)} USD</Text>
-          </View>
-        }
+        <View style={styles.detailRow}>
+          <Text style={styles.detailLabel}>Balance</Text>
+          <Text style={styles.detailValue}>${currentPaymentOption.usdBalance.toFixed(2)} USD</Text>
+        </View>
 
-        {paymentOption.requriresSelfVerification && (
+        {currentPaymentOption.requriresSelfVerification && (
           <View style={styles.verificationWarning}>
             <Text style={styles.verificationText}>
               This payment method requires identity verification
@@ -72,6 +80,17 @@ export default function PaymentOptionModal({
           <Text style={styles.actionButtonText}>Edit Payment Method</Text>
         </TouchableOpacity>
       </ScrollView>
+
+      {currentPaymentOption.id === "coinbase" &&
+        <WagmiProvider config={wagmiConfig}>
+          <PersistQueryClientProvider
+            client={wagmiQueryClient}
+            persistOptions={{ persister }}
+          >
+            <WagmiDemo paymentOption={currentPaymentOption} />
+          </PersistQueryClientProvider>
+        </WagmiProvider>
+      }
 
       <TouchableOpacity
         style={styles.cancelButton}
