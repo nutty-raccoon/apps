@@ -1,5 +1,5 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
-import { PaymentOption } from '@/types/PaymentTypes';
+import React, { createContext, useState, useContext, ReactNode, useMemo } from 'react';
+import { PaymentOption, PendingPayment } from '@/types/PaymentTypes';
 import { VerifiedUser } from '@/types/VerificationTypes';
 import { DEFAULT_PAYMENT_METHODS } from '@/constants/PaymentMethods';
 
@@ -8,8 +8,10 @@ interface PaymentContextType {
   setPaymentOptions: React.Dispatch<React.SetStateAction<PaymentOption[]>>;
   totalBalance: number;
   updatePaymentOption: (id: string, newBalance: number) => void;
-  verifiedUser?: VerifiedUser;
-  updateVerifiedUser: (verifiedUser: VerifiedUser) => void;
+  registerPendingPayment: (id: string, pendingPayment: PendingPayment) => void;
+  registerPaymentDone: (id: string) => void;
+  verifiedUser: VerifiedUser | null;
+  updateVerifiedUser: (verifiedUser: VerifiedUser | null) => void;
 }
 
 // Create the context with a default value
@@ -27,22 +29,57 @@ export const usePayment = () => {
 // Provider component to wrap the app
 export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [paymentOptions, setPaymentOptions] = useState<PaymentOption[]>(DEFAULT_PAYMENT_METHODS);
-  const [isSelfVerified, setIsSelfVerified] = useState<VerifiedUser>(null);
+  const [verifiedUser, setVerifiedUser] = useState<VerifiedUser | null>(null);
 
-  // Calculate total balance from all payment methods
-  const totalBalance = paymentOptions.reduce((sum, option) => sum + (option.userInfo && option.userInfo.usdBalance || 0), 0);
+  // Calculate total balance from all payment methods using useMemo to recompute when paymentOptions changes
+  const totalBalance = useMemo(() => {
+    return paymentOptions.reduce((sum, option) => sum + (option.usdBalance || 0), 0);
+  }, [paymentOptions]);
 
   // Function to update a specific payment option's balance
   const updatePaymentOption = (id: string, newBalance: number) => {
     setPaymentOptions(prevOptions =>
       prevOptions.map(option =>
-        option.id === id ? { ...option, usdBalance: newBalance } : option
+        option.id === id
+          ? {
+            ...option,
+            usdBalance: newBalance
+          }
+          : option
       )
     );
   };
 
-  const updateIsSelfVerified = (verifiedUser: VerifiedUser) => {
-    setIsSelfVerified(verifiedUser);
+  // Function to update a specific payment option's pending payment
+  const registerPendingPayment = (id: string, pendingPayment: PendingPayment) => {
+    setPaymentOptions(prevOptions =>
+      prevOptions.map(option =>
+        option.id === id
+          ? {
+            ...option,
+            pendingPayment: pendingPayment
+          }
+          : option
+      )
+    );
+  };
+
+  const registerPaymentDone = (id: string) => {
+    setPaymentOptions(prevOptions =>
+      prevOptions.map(option =>
+        option.id === id
+          ? {
+            ...option,
+            pendingPayment: null,
+            usdBalance: (!!option.pendingPayment) ? option.usdBalance + option.pendingPayment.amount : option.usdBalance,
+          }
+          : option
+      )
+    );
+  };
+
+  const updateVerifiedUser = (verifiedUser: VerifiedUser | null) => {
+    setVerifiedUser(verifiedUser);
   };
 
   return (
@@ -51,8 +88,10 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({ children })
       setPaymentOptions,
       totalBalance,
       updatePaymentOption,
-      verifiedUser: isSelfVerified,
-      updateVerifiedUser: updateIsSelfVerified,
+      registerPendingPayment,
+      registerPaymentDone,
+      verifiedUser,
+      updateVerifiedUser,
     }}>
       {children}
     </PaymentContext.Provider>

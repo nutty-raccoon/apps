@@ -1,6 +1,10 @@
+export interface PendingPayment {
+  amount: number;
+  txId: `0x${string}`,
+}
+
 export interface userInfo {
   id: string;
-  usdBalance: number;
 }
 
 // Define types for payment options
@@ -10,7 +14,9 @@ export interface PaymentOption {
   iconSource: any;
   priority: number;
   requriresSelfVerification: boolean,
-  userInfo?: userInfo;
+  userInfo: userInfo | null;
+  usdBalance: number;
+  pendingPayment: PendingPayment | null,
 }
 
 // Define type for dragging state

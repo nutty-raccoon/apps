@@ -1,5 +1,5 @@
 import { PaymentOption } from "@/types/PaymentTypes";
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useState, useCallback } from "react";
 import PaymentOptionItem from "./PaymentOptionItem";
 import PaymentOptionModal from "./PaymentOptionModal";
 import {
@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import DragList, { DragListRenderItemInfo } from "react-native-draglist";
+import { useFocusEffect } from "@react-navigation/native";
 
 interface DraggablePlaymentOptionsFlatListProps {
   paymentOptions: PaymentOption[],
@@ -16,23 +17,35 @@ interface DraggablePlaymentOptionsFlatListProps {
 
 export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPaymentOptions, isSelfVerified }: DraggablePlaymentOptionsFlatListProps) {
   const [selectedPaymentOption, setSelectedPaymentOption] = useState<PaymentOption | null>(null);
-  const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+
+  // Use focus effect to close modal when screen loses focus
+  // This is required as long as the coinbase smart wallet navigate us to 'mobile-wallet-protocol' on closing
+  useFocusEffect(
+    useCallback(() => {
+      // This runs when the screen comes into focus
+
+      // Return a cleanup function that runs when screen goes out of focus
+      return () => {
+        // When we navigate away or press back button, close the modal
+        handleModalClose();
+      };
+    }, [])
+  );
 
   // Handler for payment option press
   const handlePaymentOptionPress = (item: PaymentOption) => {
     setSelectedPaymentOption(item);
-    setIsModalVisible(true);
   };
 
   // Handler for modal close
   const handleModalClose = () => {
-    setIsModalVisible(false);
+    setSelectedPaymentOption(null);
   };
 
   // Render each payment option item
   const renderItem = (info: DragListRenderItemInfo<PaymentOption>) => {
     const { item, onDragStart, isActive } = info;
-    const isDisabled = (!isSelfVerified && item.requriresSelfVerification) || !item.userInfo;
+    const isDisabled = (!isSelfVerified && item.requriresSelfVerification);
 
     return (
       <PaymentOptionItem
@@ -62,15 +75,17 @@ export default function DraggablePaymentOptionsFlatList({ paymentOptions, setPay
         onReordered={onReordered}
         keyExtractor={(item) => item.id}
         renderItem={renderItem}
-        scrollEnabled={true}
+        scrollEnabled
         contentContainerStyle={styles.dragListContent}
       />
 
-      <PaymentOptionModal
-        isVisible={isModalVisible}
-        paymentOption={selectedPaymentOption}
-        onClose={handleModalClose}
-      />
+      {!!selectedPaymentOption &&
+        <PaymentOptionModal
+          paymentOption={selectedPaymentOption}
+          onClose={handleModalClose}
+        />
+      }
+
     </View>
   );
 }
